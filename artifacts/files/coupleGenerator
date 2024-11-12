@@ -5,7 +5,7 @@ strict digraph model {
 	0 [label=<
                     <TABLE BORDER="0" CELLBORDER="1"
                     CELLSPACING="0" CELLPADDING="4">
-                        <TR><TD>input-tensor<BR/>depth:0</TD><TD>(64, 100)</TD></TR>
+                        <TR><TD>input-tensor<BR/>depth:0</TD><TD>(64, 200)</TD></TR>
                     </TABLE>> fillcolor=lightyellow]
 	1 [label=<
                     <TABLE BORDER="0" CELLBORDER="1"
@@ -13,7 +13,7 @@ strict digraph model {
                     <TR>
                         <TD ROWSPAN="2">Linear<BR/>depth:1</TD>
                         <TD COLSPAN="2">input:</TD>
-                        <TD COLSPAN="2">(64, 100) </TD>
+                        <TD COLSPAN="2">(64, 200) </TD>
                     </TR>
                     <TR>
                         <TD COLSPAN="2">output: </TD>
