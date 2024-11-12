@@ -1,8 +1,10 @@
-import sys
 import os
-import argparse
+import sys
 import torch
+import argparse
 import torch.nn as nn
+
+sys.path.append("./src/")
 
 
 class CoupledGenerators(nn.Module):
@@ -100,10 +102,10 @@ class CoupledGenerators(nn.Module):
             )
 
             shared = self.sharedConvolution(x)
-            
+
             image1 = self.generator1(shared)
             image2 = self.generator2(shared)
-            
+
             return image1, image2
 
         else:
@@ -111,5 +113,44 @@ class CoupledGenerators(nn.Module):
 
 
 if __name__ == "__main__":
-    netG = CoupledGenerators()
-    image1, image2 = netG(torch.randn(64, 100))
+    parser = argparse.ArgumentParser(
+        description="CoGAN generator for Creating Images".title()
+    )
+    parser.add_argument(
+        "--latent_space",
+        default=100,
+        choices=[100, 200, 300],
+        type=int,
+        help="Dimensionality of the latent space".capitalize(),
+    )
+    parser.add_argument(
+        "--constant",
+        default=128,
+        choices=[64, 128, 256],
+        type=int,
+        help="The constant to use for the latent space".capitalize(),
+    )
+    parser.add_argument(
+        "--image_size",
+        default=32,
+        choices=[32, 64, 128],
+        type=int,
+    )
+
+    args = parser.parse_args()
+
+    latent_space = args.latent_space
+    constant = args.constant
+    image_size = args.image_size
+
+    netG = CoupledGenerators(
+        latent_space=latent_space,
+        constant=constant,
+        image_size=image_size,
+    )
+
+    image1, image2 = netG(torch.randn(64, latent_space))
+
+    assert (
+        image1.size() == image2.size()
+    ), "Image1 and Image2 must be the same size".capitalize()
