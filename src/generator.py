@@ -6,6 +6,8 @@ import torch.nn as nn
 
 sys.path.append("./src/")
 
+from utils import config
+
 
 class CoupledGenerators(nn.Module):
     def __init__(
@@ -118,21 +120,21 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--latent_space",
-        default=100,
+        default=config()["netG"]["latent_space"],
         choices=[100, 200, 300],
         type=int,
         help="Dimensionality of the latent space".capitalize(),
     )
     parser.add_argument(
         "--constant",
-        default=128,
+        default=config()["netG"]["constant"],
         choices=[64, 128, 256],
         type=int,
         help="The constant to use for the latent space".capitalize(),
     )
     parser.add_argument(
         "--image_size",
-        default=32,
+        default=config()["dataloader"]["image_size"],
         choices=[32, 64, 128],
         type=int,
     )

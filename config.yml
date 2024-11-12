@@ -1,6 +1,7 @@
 dataloader:
+  batch_size: 64
   image_size: 32
-  
+
 netG:
   latent_space: 100
   constant: 128
