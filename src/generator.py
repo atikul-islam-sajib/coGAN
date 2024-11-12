@@ -24,6 +24,9 @@ class CoupledGenerators(nn.Module):
         self.negative_slope = 0.2
         self.scale_factor = 2
 
+        self.netG1Layers = []
+        self.netG2Layers = []
+
         self.fullyConnectedLayer = nn.Linear(
             in_features=self.latent_space,
             out_features=self.constant * self.image_size // 4 * self.image_size // 4,
@@ -44,6 +47,51 @@ class CoupledGenerators(nn.Module):
             nn.Upsample(scale_factor=self.scale_factor),
         )
 
+        for index in range(2):
+            self.netG1Layers.append(
+                nn.Conv2d(
+                    in_channels=self.constant if index == 0 else self.constant // 2,
+                    out_channels=self.constant // 2 if index == 0 else 3,
+                    kernel_size=self.kernel_size,
+                    stride=self.stride_size,
+                    padding=self.padding_size,
+                )
+            )
+            (
+                self.netG1Layers.append(
+                    nn.Sequential(
+                        nn.BatchNorm2d(num_features=self.constant // 2),
+                        nn.LeakyReLU(negative_slope=self.negative_slope, inplace=True),
+                    )
+                )
+                if index == 0
+                else nn.Tanh()
+            )
+
+        for index in range(2):
+            self.netG2Layers.append(
+                nn.Conv2d(
+                    in_channels=self.constant if index == 0 else self.constant // 2,
+                    out_channels=self.constant // 2 if index == 0 else 3,
+                    kernel_size=self.kernel_size,
+                    stride=self.stride_size,
+                    padding=self.padding_size,
+                )
+            )
+            (
+                self.netG2Layers.append(
+                    nn.Sequential(
+                        nn.BatchNorm2d(num_features=self.constant // 2),
+                        nn.LeakyReLU(negative_slope=self.negative_slope, inplace=True),
+                    )
+                )
+                if index == 0
+                else nn.Tanh()
+            )
+
+        self.generator1 = nn.Sequential(*self.netG1Layers)
+        self.generator2 = nn.Sequential(*self.netG2Layers)
+
     def forward(self, x):
         if isinstance(x, torch.Tensor):
             x = self.fullyConnectedLayer(x)
@@ -51,7 +99,12 @@ class CoupledGenerators(nn.Module):
                 x.size(0), self.constant, self.image_size // 4, self.image_size // 4
             )
 
-            return self.sharedConvolution(x)
+            shared = self.sharedConvolution(x)
+            
+            image1 = self.generator1(shared)
+            image2 = self.generator2(shared)
+            
+            return image1, image2
 
         else:
             raise ValueError("Input should be a torch.Tensor".capitalize())
@@ -59,4 +112,4 @@ class CoupledGenerators(nn.Module):
 
 if __name__ == "__main__":
     netG = CoupledGenerators()
-    print(netG(torch.randn(64, 100)).size())
+    image1, image2 = netG(torch.randn(64, 100))
