@@ -162,8 +162,8 @@ if __name__ == "__main__":
 
     try:
         draw_graph(model=netG, input_data=torch.randn(batch_size, latent_space)).visual_graph.render(
-            filename=os.path.join("../artifacts/files/", "coupleGenerator"), format="png"
+            filename=os.path.join("./artifacts/files/", "coupleGenerator"), format="png"
         )
-        print("Graph saved in ../artifacts/files/coupleGenerator.png")
+        print("Graph saved in ./artifacts/files/coupleGenerator.png")
     except Exception as e:
         print(f"Error during graph rendering: {e}")
