@@ -8,6 +8,7 @@ import unittest
 sys.path.append("./src")
 
 from utils import config
+from loss import AdversarialLoss
 from generator import CoupledGenerators
 from discriminator import CoupledDiscriminators
 
@@ -32,6 +33,8 @@ class UnitTest(unittest.TestCase):
             image_size=self.image_size,
         )
 
+        self.adversarial_loss = AdversarialLoss()
+
     def test_coupleGenerator(self):
         self.Z = torch.randn(self.batch_size, self.latent_space)
 
@@ -52,6 +55,14 @@ class UnitTest(unittest.TestCase):
             validity1.size(),
             validity2.size(),
             "Validity1 and Validity2 must be the same size",
+        )
+
+    def test_adversarialLoss(self):
+        predicted = torch.Tensor([1.0, 1.0, 0.0, 1.0, 0.0])
+        actual = torch.Tensor([1.0, 0.0, 1.0, 0.0, 0.0])
+
+        self.assertIsInstance(
+            self.adversarial_loss(pred=predicted, actual=actual), torch.Tensor
         )
 
 
