@@ -145,13 +145,15 @@ if __name__ == "__main__":
     constant = args.constant
     image_size = args.image_size
 
+    batch_size = config()["dataloader"]["batch_size"]
+
     netG = CoupledGenerators(
         latent_space=latent_space,
         constant=constant,
         image_size=image_size,
     )
 
-    image1, image2 = netG(torch.randn(64, latent_space))
+    image1, image2 = netG(torch.randn(batch_size, latent_space))
 
     assert (
         image1.size() == image2.size()
