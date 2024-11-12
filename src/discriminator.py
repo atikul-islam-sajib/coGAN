@@ -3,6 +3,7 @@ import sys
 import torch
 import argparse
 import torch.nn as nn
+from torchview import draw_graph
 
 sys.path.append("./src/")
 
@@ -108,7 +109,7 @@ if __name__ == "__main__":
         image1=torch.randn((batch_size, channels, image_size, image_size)),
         image2=torch.randn((batch_size, channels, image_size, image_size)),
     )
-    
+
     assert (
         validity1.size() == validity2.size()
     ), "Validity1 and Validity2 must be the same size".capitalize()
@@ -116,3 +117,16 @@ if __name__ == "__main__":
     print("Validity1 size # {}".format(validity1.size()))
     print("Validity2 size # {}".format(validity2.size()))
 
+    try:
+        input_data1 = torch.randn((batch_size, channels, image_size, image_size))
+        input_data2 = torch.randn((batch_size, channels, image_size, image_size))
+
+        draw_graph(
+            model=netD, input_data=(input_data1, input_data2)
+        ).visual_graph.render(
+            filename=os.path.join("./artifacts/files/", "coupleDiscriminator"),
+            format="png",
+        )
+        print("Graph saved in ./artifacts/files/coupleDiscriminator.png")
+    except Exception as e:
+        print(f"Error during graph rendering: {e}")
