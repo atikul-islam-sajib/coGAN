@@ -100,8 +100,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     batch_size = config()["dataloader"]["batch_size"]
-    image_size = config()["dataloader"]["image_size"]
-    constant = config()["netG"]["constant"]
+    image_size = args.image_size
+    constant = args.constant
     channels = 3
 
     netD = CoupledDiscriminators()
