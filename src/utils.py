@@ -2,7 +2,24 @@ import os
 import sys
 import yaml
 import torch
+import joblib
 import torch.nn as nn
+
+
+def dump(value: str, filename: str):
+    if (value is not None) and (filename is not None):
+        joblib.dump(value=value, filename=filename)
+    else:
+        raise ValueError(
+            f"Both 'value' and 'filename' should be provided.".capitalize()
+        )
+
+
+def load(filename: str):
+    if filename is not None:
+        return joblib.load(filename=filename)
+    else:
+        raise ValueError(f"Please provide a valid 'filename' to load.".capitalize())
 
 
 def config():
