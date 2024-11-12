@@ -54,7 +54,7 @@ class CoupledDiscriminators(nn.Module):
             in_features=self.constant * (self.image_size // 2**4) ** 2,
             out_features=self.in_channels // self.in_channels,
         )
-        
+
         self.discriminator2 = nn.Linear(
             in_features=self.constant * (self.image_size // 2**4) ** 2,
             out_features=self.in_channels // self.in_channels,
@@ -65,10 +65,10 @@ class CoupledDiscriminators(nn.Module):
             shared = self.sharedConvolution(image1)
 
             shared = shared.view(shared.size(0), -1)
-            
+
             validity1 = self.discriminator1(shared)
             validity2 = self.discriminator2(shared)
-            
+
             return validity1, validity2
 
         else:
@@ -76,11 +76,43 @@ class CoupledDiscriminators(nn.Module):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Discriminator for the coupleGAN".title()
+    )
+    parser.add_argument(
+        "--image_size",
+        default=config()["dataloader"]["image_size"],
+        choices=[32, 64, 128],
+        type=int,
+        help="Th size of the image to be loaded".capitalize(),
+    )
+    parser.add_argument(
+        "--constant",
+        default=config()["netG"]["constant"],
+        choices=[
+            128,
+        ],
+        type=int,
+        help="The constant to use for the latent space".capitalize(),
+    )
+
+    args = parser.parse_args()
+
+    batch_size = config()["dataloader"]["batch_size"]
+    image_size = config()["dataloader"]["image_size"]
+    constant = config()["netG"]["constant"]
+    channels = 3
+
     netD = CoupledDiscriminators()
     validity1, validity2 = netD(
-            image1=torch.randn((64, 3, 32, 32)), image2=torch.randn((64, 3, 32, 32))
-        )
+        image1=torch.randn((batch_size, channels, image_size, image_size)),
+        image2=torch.randn((batch_size, channels, image_size, image_size)),
+    )
     
-    
+    assert (
+        validity1.size() == validity2.size()
+    ), "Validity1 and Validity2 must be the same size".capitalize()
+
     print("Validity1 size # {}".format(validity1.size()))
     print("Validity2 size # {}".format(validity2.size()))
+
