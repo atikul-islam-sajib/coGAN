@@ -3,6 +3,7 @@ import sys
 import torch
 import argparse
 import torch.nn as nn
+from torchview import draw_graph
 
 sys.path.append("./src/")
 
@@ -158,3 +159,11 @@ if __name__ == "__main__":
     assert (
         image1.size() == image2.size()
     ), "Image1 and Image2 must be the same size".capitalize()
+
+    try:
+        draw_graph(model=netG, input_data=torch.randn(batch_size, latent_space)).visual_graph.render(
+            filename=os.path.join("../artifacts/files/", "coupleGenerator"), format="png"
+        )
+        print("Graph saved in ../artifacts/files/coupleGenerator.png")
+    except Exception as e:
+        print(f"Error during graph rendering: {e}")
