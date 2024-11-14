@@ -6,11 +6,12 @@ import numpy as np
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 from torchvision.utils import save_image
 
 sys.path.append("./src/")
 
-from utils import config, load, device_init
+from utils import config, load, device_init, dump
 from helper import helper
 from loss import AdversarialLoss
 from generator import CoupledGenerators
@@ -173,7 +174,7 @@ class Trainer:
         )
 
         total_loss = (predicted_image1_loss + predicted_image2_loss) / 2
-        
+
         if self.l1_regularization:
             total_loss += self.l1_regularizer(model=self.netG)
         elif self.l2_regularization:
@@ -312,9 +313,39 @@ class Trainer:
                 print(f"Error occurred during training in model_history: {str(e)}")
                 exit(1)
 
+        try:
+            dump(
+                value=self.history,
+                filename=os.path.join(config()["path"]["metrics_path"], "history.pkl"),
+            )
+        except Exception as e:
+            print(f"Error occurred during training in training_completion: {str(e)}")
+            exit(1)
+
     @staticmethod
     def model_history():
-        pass
+        metrics = os.path.join(config()["path"]["metrics_path"], "history.pkl")
+        metrics = load(filename=metrics)
+
+        _, axes = plt.subplots(1, 2, figsize=(15, 10))
+
+        axes[0].plot(metrics["netG_loss"], label="Generator Loss")
+        axes[0].legend()
+        axes[0].set_title("Generator Loss")
+        axes[0].set_xlabel("Epochs")
+        axes[1].set_ylabel("Generator Loss")
+
+        axes[1].plot(metrics["netD_loss"], label="Discriminator Loss")
+        axes[1].legend()
+        axes[1].set_title("Discriminator Loss")
+        axes[1].set_xlabel("Epochs")
+        axes[1].set_ylabel("Discriminator Loss")
+
+        plt.tight_layout()
+        plt.savefig(
+            os.path.join(config()["path"]["metrics_path"], "learning_curves.jpeg")
+        )
+        plt.show()
 
 
 if __name__ == "__main__":
@@ -424,3 +455,5 @@ if __name__ == "__main__":
     )
 
     trainer.train()
+
+    Trainer.model_history()

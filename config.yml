@@ -6,6 +6,7 @@ path:
   test_result: "./artifacts/outputs/test_result/"
   train_models: "./artifacts/checkpoints/train_models/"
   test_model: "./artifacts/checkpoints/test_model/"
+  metrics_path: "./artifacts/metrics/"
 
 dataloader:
   dataset: "./data/raw/dataset.zip"
@@ -18,7 +19,7 @@ netG:
   constant: 128
 
 trainer:
-  epochs: 2
+  epochs: 5
   lr: 2e-4
   momentum: 0.75
   beta1: 0.5
