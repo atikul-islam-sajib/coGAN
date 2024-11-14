@@ -7,6 +7,7 @@ from tqdm import tqdm
 import torch.nn as nn
 from PIL import Image
 from torchvision import transforms
+from sklearn.model_selection import train_test_split
 
 sys.path.append("./src/")
 
@@ -49,8 +50,20 @@ class Loader:
                 ]
             )
 
-    def split_dataset(self):
-        pass
+    def split_dataset(self, **dataset):
+        X = dataset["X"]
+        y = dataset["y"]
+
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=self.split_size, random_state=42
+        )
+
+        return {
+            "X_train": X_train,
+            "X_test": X_test,
+            "y_train": y_train,
+            "y_test": y_test,
+        }
 
     def features_extractor(self):
         dataset = os.path.join(config()["path"]["processed_path"], "dataset")
@@ -73,6 +86,8 @@ class Loader:
         assert len(self.X1) == len(
             self.X2
         ), "Length should be same while extracting the image".capitalize()
+
+        self.split_dataset(X=self.X1, y=self.X2)
 
     def unzip_folder(self):
         if os.path.exists(path=config()["path"]["processed_path"]):
