@@ -1,6 +1,7 @@
 import os
 import sys
 import torch
+import mlflow
 import argparse
 import numpy as np
 import torch.nn as nn
@@ -244,83 +245,132 @@ class Trainer:
             print(f"Epoch: {epoch + 1}/{self.epochs} is completed".capitalize())
 
     def train(self):
-        for _, epoch in tqdm(enumerate(range(self.epochs))):
-            netG_loss = []
-            netD_loss = []
-            for idx, (image1, image2) in enumerate(self.train_dataloader):
-                image1 = image1.to(self.device)
-                image2 = image2.to(self.device)
+        with mlflow.start_run(run_name="coupledGAN") as run:
+            for _, epoch in tqdm(enumerate(range(self.epochs))):
+                netG_loss = []
+                netD_loss = []
+                for idx, (image1, image2) in enumerate(self.train_dataloader):
+                    image1 = image1.to(self.device)
+                    image2 = image2.to(self.device)
 
-                batch_size = image1.size(0)
-                latent_dim = torch.randn(
-                    (batch_size, config()["netG"]["latent_space"])
-                ).to(self.device)
+                    batch_size = image1.size(0)
+                    latent_dim = torch.randn(
+                        (batch_size, config()["netG"]["latent_space"])
+                    ).to(self.device)
 
-                netG_loss.append(
-                    self.update_netG_training(
-                        image1=image1, image2=image2, latent_dim=latent_dim
+                    netG_loss.append(
+                        self.update_netG_training(
+                            image1=image1, image2=image2, latent_dim=latent_dim
+                        )
                     )
-                )
-                netD_loss.append(
-                    self.update_netD_training(
-                        image1=image1, image2=image2, latent_dim=latent_dim
-                    )
-                )
-
-            try:
-                self.display_progress(
-                    epoch=epoch,
-                    train_loss=np.mean(netG_loss),
-                    valid_loss=np.mean(netD_loss),
-                )
-            except Exception as e:
-                print(f"Error occurred during training in display progress: {str(e)}")
-                exit(1)
-
-            try:
-                batch_size = config()["dataloader"]["batch_size"]
-                latent_dim = config()["netG"]["latent_space"]
-
-                Z = torch.randn((batch_size, latent_dim))
-
-                image1, image2 = self.netG(Z)
-
-                train_results = config()["path"]["train_results"]
-
-                for filename, image in [("image1", image1), ("image2", image2)]:
-                    save_image(
-                        image, os.path.join(train_results, f"{filename}{epoch + 1}.png")
+                    netD_loss.append(
+                        self.update_netD_training(
+                            image1=image1, image2=image2, latent_dim=latent_dim
+                        )
                     )
 
-            except Exception as e:
-                print(f"Error occurred during training in saving images: {str(e)}")
-                exit(1)
+                try:
+                    self.display_progress(
+                        epoch=epoch,
+                        train_loss=np.mean(netG_loss),
+                        valid_loss=np.mean(netD_loss),
+                    )
+                except Exception as e:
+                    print(
+                        f"Error occurred during training in display progress: {str(e)}"
+                    )
+                    exit(1)
+
+                try:
+                    batch_size = config()["dataloader"]["batch_size"]
+                    latent_dim = config()["netG"]["latent_space"]
+
+                    Z = torch.randn((batch_size, latent_dim))
+
+                    image1, image2 = self.netG(Z)
+
+                    train_results = config()["path"]["train_results"]
+
+                    for filename, image in [("image1", image1), ("image2", image2)]:
+                        save_image(
+                            image,
+                            os.path.join(train_results, f"{filename}{epoch + 1}.png"),
+                        )
+
+                except Exception as e:
+                    print(f"Error occurred during training in saving images: {str(e)}")
+                    exit(1)
+
+                try:
+                    self.saved_checkpoints(
+                        train_loss=np.mean(netG_loss),
+                        valid_loss=np.mean(netD_loss),
+                        epoch=epoch,
+                    )
+                except Exception as e:
+                    print(
+                        f"Error occurred during training in saved checkpoints: {str(e)}"
+                    )
+                    exit(1)
+
+                try:
+                    self.history["netG_loss"].append(np.mean(netG_loss))
+                    self.history["netD_loss"].append(np.mean(netD_loss))
+                except Exception as e:
+                    print(f"Error occurred during training in model_history: {str(e)}")
+                    exit(1)
+
+                try:
+                    mlflow.log_params(
+                        {
+                            "epochs": self.epochs,
+                            "lr": self.lr,
+                            "momentum": self.momentum,
+                            "beta1": self.beta1,
+                            "beta2": self.beta2,
+                            "regularizer": self.regularizer,
+                            "adam": self.adam,
+                            "SGD": self.SGD,
+                            "device": self.device,
+                            "l1_regularization": self.l1_regularization,
+                            "l2_regularization": self.l2_regularization,
+                            "elasticnet_regularization": self.elasticnet_regularization,
+                            "verbose": self.verbose,
+                        }
+                    )
+                except Exception as e:
+                    print(f"An error occurred while logging parameters to MLflow: {e}")
+
+                try:
+                    mlflow.log_metric(
+                        key="netG_loss", value=np.mean(netG_loss), step=epoch + 1
+                    )
+                    mlflow.log_metric(
+                        key="netD_loss", value=np.mean(netD_loss), step=epoch + 1
+                    )
+                except Exception as e:
+                    print(f"An error occurred while logging metrics to MLflow: {e}")
 
             try:
-                self.saved_checkpoints(
-                    train_loss=np.mean(netG_loss),
-                    valid_loss=np.mean(netD_loss),
-                    epoch=epoch,
+                dump(
+                    value=self.history,
+                    filename=os.path.join(
+                        config()["path"]["metrics_path"], "history.pkl"
+                    ),
                 )
             except Exception as e:
-                print(f"Error occurred during training in saved checkpoints: {str(e)}")
+                print(
+                    f"Error occurred during training in training_completion: {str(e)}"
+                )
                 exit(1)
 
             try:
-                self.history["netG_loss"].append(np.mean(netG_loss))
-                self.history["netD_loss"].append(np.mean(netD_loss))
+                mlflow.pytorch.log_model(self.netG, "coupledGAN")
             except Exception as e:
-                print(f"Error occurred during training in model_history: {str(e)}")
+                print(
+                    f"Error occurred during the saving the model using MLFlow: {str(e)}"
+                )
                 exit(1)
-
-        try:
-            dump(
-                value=self.history,
-                filename=os.path.join(config()["path"]["metrics_path"], "history.pkl"),
-            )
-        except Exception as e:
-            print(f"Error occurred during training in training_completion: {str(e)}")
-            exit(1)
 
     @staticmethod
     def model_history():
