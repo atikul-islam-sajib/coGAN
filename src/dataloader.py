@@ -3,16 +3,18 @@ import sys
 import cv2
 import zipfile
 import torch
+import math
 from tqdm import tqdm
 import torch.nn as nn
 from PIL import Image
+import matplotlib.pyplot as plt
 from torchvision import transforms
 from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
 
 sys.path.append("./src/")
 
-from utils import config, dump
+from utils import config, dump, load
 
 
 class Loader:
@@ -137,6 +139,51 @@ class Loader:
             print(f"Error occurred: {e}")
             return None
 
+    def display_images(self):
+        dataloader = os.path.join(
+            config()["path"]["processed_path"], "valid_dataloader.pkl"
+        )
+
+        dataloader = load(filename=dataloader)
+
+        X1, X2 = next(iter(dataloader))
+
+        assert (
+            X1.size() == X2.size()
+        ), "Cannot be possible to display the images in the same order".capitalize()
+
+        num_of_rows = int(math.sqrt(X1.size(0)))
+        num_of_columns = X1.size(0) // num_of_rows
+
+        plt.figure(figsize=(40, 15))
+        
+        plt.suptitle("Training Images".title())
+
+        for index, image1 in enumerate(X1):
+            image1 = image1.squeeze().permute(1, 2, 0).numpy()
+            image1 = (image1 - image1.min()) / (image1.max() - image1.min())
+
+            image2 = X2[index].squeeze().permute(1, 2, 0).numpy()
+            image2 = (image2 - image2.min()) / (image2.max() - image2.min())
+
+            plt.subplot(2 * num_of_rows, 2 * num_of_columns, 2 * index + 1)
+            plt.imshow(image1)
+            plt.title("IMG-1")
+            plt.xticks([])
+            plt.yticks([])
+            plt.axis("off")
+            
+            plt.subplot(2 * num_of_rows, 2 * num_of_columns, 2 * index + 2)
+            plt.imshow(image2)
+            plt.title("IMG-2")
+            plt.xticks([])
+            plt.yticks([])
+            plt.axis("off")
+        
+        plt.tight_layout()
+        plt.savefig(os.path.join(config()["path"]["artifacts_path"], "images.jpeg"))
+        plt.show()
+
     @staticmethod
     def dataset_details():
         pass
@@ -151,4 +198,5 @@ if __name__ == "__main__":
     )
 
     # loader.unzip_folder()
-    loader.create_dataloader()
+    # loader.create_dataloader()
+    loader.display_images()
