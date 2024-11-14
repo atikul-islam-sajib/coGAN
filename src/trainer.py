@@ -97,6 +97,9 @@ class Trainer:
 
         self.device = device_init(device=self.device)
 
+        self.loss = float("inf")
+        self.history = {"netG_loss": [], "netD_loss": []}
+
     def l1_regularizer(self, model):
         if model is not None:
             return config()["trainer"]["regularizer"] * sum(
@@ -117,7 +120,36 @@ class Trainer:
             )
 
     def saved_checkpoints(self, **kwargs):
-        pass
+        os.makedirs(config()["path"]["train_models"], exist_ok=True)
+        os.makedirs(config()["path"]["test_model"], exist_ok=True)
+
+        train_loss = kwargs["train_loss"]
+        valid_loss = kwargs["valid_loss"]
+
+        epoch = kwargs["epoch"]
+
+        if self.loss > train_loss:
+            self.loss = train_loss
+            torch.save(
+                {
+                    "netG": self.netG.state_dict(),
+                    "train_loss": train_loss,
+                    "valid_loss": valid_loss,
+                    "epoch": epoch + 1,
+                },
+                os.path.join(
+                    config()["path"]["test_model"],
+                    "best.pth",
+                ),
+            )
+        else:
+            torch.save(
+                self.netG.state_dict(),
+                os.path.join(
+                    config()["path"]["train_models"],
+                    "netG{}.pth".format(epoch + 1),
+                ),
+            )
 
     def update_netG_training(self, **kwargs):
         self.optimizerG.zero_grad()
@@ -202,8 +234,8 @@ class Trainer:
 
     def train(self):
         for _, epoch in tqdm(enumerate(range(self.epochs))):
-            train_loss = []
-            valid_loss = []
+            netG_loss = []
+            netD_loss = []
             for idx, (image1, image2) in enumerate(self.train_dataloader):
                 image1 = image1.to(self.device)
                 image2 = image2.to(self.device)
@@ -213,12 +245,12 @@ class Trainer:
                     (batch_size, config()["netG"]["latent_space"])
                 ).to(self.device)
 
-                train_loss.append(
+                netG_loss.append(
                     self.update_netG_training(
                         image1=image1, image2=image2, latent_dim=latent_dim
                     )
                 )
-                valid_loss.append(
+                netD_loss.append(
                     self.update_netD_training(
                         image1=image1, image2=image2, latent_dim=latent_dim
                     )
@@ -227,8 +259,8 @@ class Trainer:
             try:
                 self.display_progress(
                     epoch=epoch,
-                    train_loss=np.mean(train_loss),
-                    valid_loss=np.mean(valid_loss),
+                    train_loss=np.mean(netG_loss),
+                    valid_loss=np.mean(netD_loss),
                 )
             except Exception as e:
                 print(f"Error occurred during training in display progress: {str(e)}")
@@ -253,11 +285,30 @@ class Trainer:
                 print(f"Error occurred during training in saving images: {str(e)}")
                 exit(1)
 
+            try:
+                self.saved_checkpoints(
+                    train_loss=np.mean(netG_loss),
+                    valid_loss=np.mean(netD_loss),
+                    epoch=epoch,
+                )
+            except Exception as e:
+                print(f"Error occurred during training in saved checkpoints: {str(e)}")
+                exit(1)
+                
+            try:
+                self.history["netG_loss"].append(np.mean(netG_loss))
+                self.history["netD_loss"].append(np.mean(netD_loss))
+                
+                print(self.history)
+            except Exception as e:
+                print(f"Error occurred during training in model_history: {str(e)}")
+                exit(1)
+
     @staticmethod
     def model_history():
         pass
 
 
 if __name__ == "__main__":
-    trainer = Trainer(epochs=30, device="cpu")
+    trainer = Trainer(epochs=4, device="cpu")
     trainer.train()
