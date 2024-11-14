@@ -14,3 +14,6 @@ dataloader:
 netG:
   latent_space: 100
   constant: 128
+
+trainer:
+  regularizer: 0.01

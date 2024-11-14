@@ -97,6 +97,25 @@ class Trainer:
 
         self.device = device_init(device=self.device)
 
+    def l1_regularizer(self, model):
+        if model is not None:
+            return config()["trainer"]["regularizer"] * sum(
+                torch.norm(params, 1) for params in model.parameters()
+            )
+
+    def l2_regularizer(self, model):
+        if model is not None:
+            return config()["trainer"]["regularizer"] * sum(
+                torch.norm(params, 2) ** 2 for params in model.parameters()
+            )
+
+    def elasticnet_regularizer(self, model):
+        if model is not None:
+            return config()["trainer"]["regularizer"] * sum(
+                torch.norm(params, 1) + 0.5 * torch.norm(params, 2) ** 2
+                for params in model.parameters()
+            )
+
     def saved_checkpoints(self, **kwargs):
         pass
 
