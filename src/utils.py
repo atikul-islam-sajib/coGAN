@@ -5,6 +5,8 @@ import torch
 import joblib
 import torch.nn as nn
 
+sys.path.append("./src/")
+
 
 def dump(value: str, filename: str):
     if (value is not None) and (filename is not None):
