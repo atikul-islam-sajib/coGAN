@@ -1,12 +1,11 @@
 import os
 import sys
 import cv2
-import zipfile
-import torch
 import math
-from tqdm import tqdm
-import torch.nn as nn
+import zipfile
+import pandas as pd
 from PIL import Image
+from tqdm import tqdm
 import matplotlib.pyplot as plt
 from torchvision import transforms
 from torch.utils.data import DataLoader
@@ -15,7 +14,6 @@ from sklearn.model_selection import train_test_split
 sys.path.append("./src/")
 
 from utils import config, dump, load
-
 
 class Loader:
     def __init__(
@@ -156,7 +154,7 @@ class Loader:
         num_of_columns = X1.size(0) // num_of_rows
 
         plt.figure(figsize=(40, 15))
-        
+
         plt.suptitle("Training Images".title())
 
         for index, image1 in enumerate(X1):
@@ -172,21 +170,72 @@ class Loader:
             plt.xticks([])
             plt.yticks([])
             plt.axis("off")
-            
+
             plt.subplot(2 * num_of_rows, 2 * num_of_columns, 2 * index + 2)
             plt.imshow(image2)
             plt.title("IMG-2")
             plt.xticks([])
             plt.yticks([])
             plt.axis("off")
-        
+
         plt.tight_layout()
         plt.savefig(os.path.join(config()["path"]["artifacts_path"], "images.jpeg"))
+        print("Image stored in " + config()["path"]["artifacts_path"])
         plt.show()
 
     @staticmethod
     def dataset_details():
-        pass
+        train_dataloader = os.path.join(
+            config()["path"]["processed_path"], "train_dataloader.pkl"
+        )
+        valid_dataloader = os.path.join(
+            config()["path"]["processed_path"], "valid_dataloader.pkl"
+        )
+
+        train_dataloader = load(filename=train_dataloader)
+        valid_dataloader = load(filename=valid_dataloader)
+
+        total_train_dataset = sum(X1.size(0) for X1, _ in train_dataloader)
+        total_valid_dataset = sum(X1.size(0) for X1, _ in valid_dataloader)
+
+        total_dataset = total_train_dataset + total_valid_dataset
+
+        train_dataset_dimension, _ = next(iter(train_dataloader))
+        valid_dataset_dimension, _ = next(iter(valid_dataloader))
+
+        dataset_details = pd.DataFrame(
+            {
+                "train_dataset_dimension": str(train_dataset_dimension.size()),
+                "valid_dataset_dimension": str(valid_dataset_dimension.size()),
+                "total_dataset": total_dataset,
+                "train_dataset_size": total_train_dataset,
+                "valid_dataset_size": total_valid_dataset,
+                "total_dataset_size": total_dataset,
+                "percentage_of_train_dataset": str(
+                    total_train_dataset / total_dataset * 100
+                    if total_train_dataset > 0
+                    else 0
+                )
+                + "%",
+                "percentage_of_valid_dataset": str(
+                    total_valid_dataset / total_dataset * 100
+                    if total_valid_dataset > 0
+                    else 0
+                )
+                + "%",
+            },
+            index=["Dataset Details"],
+        ).T
+
+        dataset_details.to_csv(
+            os.path.join(config()["path"]["artifacts_path"], "dataset_details.csv")
+        )
+
+        print(
+            "Dataset details stored in the folder {}".capitalize().format(
+                config()["path"]["artifacts_path"]
+            )
+        )
 
 
 if __name__ == "__main__":
@@ -199,4 +248,5 @@ if __name__ == "__main__":
 
     # loader.unzip_folder()
     # loader.create_dataloader()
-    loader.display_images()
+    # loader.display_images()
+    Loader.dataset_details()

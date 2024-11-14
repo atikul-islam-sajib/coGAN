@@ -1,0 +1,9 @@
+,Dataset Details
+train_dataset_dimension,"torch.Size([64, 3, 32, 32])"
+valid_dataset_dimension,"torch.Size([64, 3, 32, 32])"
+total_dataset,500
+train_dataset_size,375
+valid_dataset_size,125
+total_dataset_size,500
+percentage_of_train_dataset,75.0%
+percentage_of_valid_dataset,25.0%
