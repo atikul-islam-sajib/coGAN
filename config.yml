@@ -1,10 +1,12 @@
 path:
-  raw_path: "./data/raw"
-  processed_path: "./data/processed"
+  raw_path: "./data/raw/"
+  processed_path: "./data/processed/"
 
 dataloader:
+  dataset: "./data/raw/dataset.zip"
   batch_size: 64
   image_size: 32
+  split_size: 0.25
 
 netG:
   latent_space: 100
