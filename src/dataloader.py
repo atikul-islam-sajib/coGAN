@@ -4,6 +4,7 @@ import cv2
 import math
 import zipfile
 import argparse
+import warnings
 import pandas as pd
 from PIL import Image
 from tqdm import tqdm
@@ -15,6 +16,8 @@ from sklearn.model_selection import train_test_split
 sys.path.append("./src/")
 
 from utils import config, dump, load
+
+warnings.filterwarnings("ignore")
 
 
 class Loader:
@@ -84,7 +87,7 @@ class Loader:
                 self.X2.append(self.transforms(type="coupled")(image))
 
             else:
-                print(f"Invalid image: {image}")
+                print(f"Invalid image: {image}".capitalize())
 
         assert len(self.X1) == len(
             self.X2
@@ -285,19 +288,19 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"Error occurred: {e}")
         exit(1)
-    
+
     try:
         loader.create_dataloader()
     except Exception as e:
         print(f"Error occurred: {e}")
         exit(1)
-    
+
     try:
         loader.display_images()
     except Exception as e:
         print(f"Error occurred: {e}")
         exit(1)
-    
+
     try:
         Loader.dataset_details()
     except Exception as e:
