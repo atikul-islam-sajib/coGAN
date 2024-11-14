@@ -25,6 +25,7 @@ class Trainer:
         momentum: float = 0.75,
         beta1: float = 0.5,
         beta2: float = 0.999,
+        regularizer: float = 1e-2,
         device: str = "cuda",
         adam: bool = True,
         SGD: bool = False,
@@ -39,6 +40,7 @@ class Trainer:
         self.momentum = momentum
         self.beta1 = beta1
         self.beta2 = beta2
+        self.regularizer = regularizer
         self.device = device
         self.adam = adam
         self.SGD = SGD
@@ -103,19 +105,19 @@ class Trainer:
 
     def l1_regularizer(self, model):
         if model is not None:
-            return config()["trainer"]["regularizer"] * sum(
+            return self.regularizer * sum(
                 torch.norm(params, 1) for params in model.parameters()
             )
 
     def l2_regularizer(self, model):
         if model is not None:
-            return config()["trainer"]["regularizer"] * sum(
+            return self.regularizer * sum(
                 torch.norm(params, 2) ** 2 for params in model.parameters()
             )
 
     def elasticnet_regularizer(self, model):
         if model is not None:
-            return config()["trainer"]["regularizer"] * sum(
+            return self.regularizer * sum(
                 torch.norm(params, 1) + 0.5 * torch.norm(params, 2) ** 2
                 for params in model.parameters()
             )
