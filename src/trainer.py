@@ -182,7 +182,7 @@ class Trainer:
             print(f"Epoch: {epoch + 1}/{self.epochs} is completed".capitalize())
 
     def train(self):
-        for index, epoch in tqdm(enumerate(range(self.epochs))):
+        for _, epoch in tqdm(enumerate(range(self.epochs))):
             train_loss = []
             valid_loss = []
             for idx, (image1, image2) in enumerate(self.train_dataloader):
@@ -231,7 +231,7 @@ class Trainer:
                     )
 
             except Exception as e:
-                print(f"Error occurred during training: {str(e)}")
+                print(f"Error occurred during training in saving images: {str(e)}")
                 exit(1)
 
     @staticmethod
