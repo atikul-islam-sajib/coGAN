@@ -159,17 +159,17 @@ class Trainer:
             + predicted_actual_image1_loss
             + predicted_actual_image2_loss
         ) / 4
-        
+
         total_loss.backward()
         self.optimizerD.step()
-        
+
         return total_loss.item()
 
     def display_progress(self, **kwargs):
         pass
 
     def train(self):
-        for index, epoch in tqdm(range(self.epochs)):
+        for index, epoch in tqdm(enumerate(range(self.epochs))):
             train_loss = []
             valid_loss = []
             for idx, (image1, image2) in enumerate(self.train_dataloader):
@@ -178,7 +178,7 @@ class Trainer:
 
                 batch_size = image1.size(0)
                 latent_dim = torch.randn(
-                    (batch_size, config()["dataloader"]["latent_space"])
+                    (batch_size, config()["netG"]["latent_space"])
                 ).to(self.device)
 
                 train_loss.append(
@@ -192,12 +192,13 @@ class Trainer:
                     )
                 )
 
+            print(train_loss, valid_loss)
+
     @staticmethod
     def model_history():
         pass
 
 
 if __name__ == "__main__":
-    trainer = Trainer(
-        epochs=1,
-    )
+    trainer = Trainer(epochs=1, device="cpu")
+    trainer.train()
