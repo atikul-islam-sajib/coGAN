@@ -1,3 +1,7 @@
+path:
+  raw_path: "./data/raw"
+  processed_path: "./data/processed"
+
 dataloader:
   batch_size: 64
   image_size: 32
