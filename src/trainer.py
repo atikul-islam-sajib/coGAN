@@ -173,6 +173,13 @@ class Trainer:
         )
 
         total_loss = (predicted_image1_loss + predicted_image2_loss) / 2
+        
+        if self.l1_regularization:
+            total_loss += self.l1_regularizer(model=self.netG)
+        elif self.l2_regularization:
+            total_loss += self.l2_regularizer(model=self.netG)
+        elif self.elasticnet_regularization:
+            total_loss += self.elasticnet_regularizer(model=self.netG)
 
         total_loss.backward()
         self.optimizerG.step()
