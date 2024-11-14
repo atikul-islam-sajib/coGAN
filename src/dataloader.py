@@ -40,7 +40,7 @@ class Loader:
 
 if __name__ == "__main__":
     loader = Loader(
-        dataset="/Users/macbook/Desktop/coGAN/data/raw/dataset.zip",
+        dataset=config()["dataloader"]["dataset"],
         batch_size=config()["dataloader"]["batch_size"],
         image_size=config()["dataloader"]["image_size"],
         split_size=config()["dataloader"]["split_size"],
