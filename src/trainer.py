@@ -3,11 +3,11 @@ import sys
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import torch.utils
+from tqdm import tqdm
 
 sys.path.append("./src/")
 
-from utils import config, load
+from utils import config, load, device_init
 from helper import helper
 from loss import AdversarialLoss
 from generator import CoupledGenerators
@@ -93,11 +93,38 @@ class Trainer:
 
         self.adversarial_loss.__class__ == AdversarialLoss, "AdversarialLoss should be the class of Adversarial".capitalize()
 
+        self.device = device_init(device=self.device)
+
     def saved_checkpoints(self, **kwargs):
         pass
 
     def update_netG_training(self, **kwargs):
-        pass
+        self.optimizerG.zero_grad()
+
+        image1 = kwargs["image1"]
+        image2 = kwargs["image2"]
+
+        latent_dim = kwargs["latent_dim"]
+
+        generated_image1, generated_image2 = self.netG(latent_dim)
+
+        predicted_image1, predicted_image2 = self.netD(
+            generated_image1, generated_image2
+        )
+
+        predicted_image1_loss = self.adversarial_loss(
+            predicted_image1, torch.ones_like(predicted_image1)
+        )
+        predicted_image2_loss = self.adversarial_loss(
+            predicted_image2, torch.ones_like(predicted_image2)
+        )
+
+        total_loss = (predicted_image1_loss + predicted_image2_loss) / 2
+
+        total_loss.backward()
+        self.optimizerG.step()
+
+        return total_loss.item()
 
     def update_netD_training(self, **kwargs):
         pass
@@ -106,7 +133,23 @@ class Trainer:
         pass
 
     def train(self):
-        pass
+        for index, epoch in tqdm(range(self.epochs)):
+            train_loss = []
+            valid_loss = []
+            for idx, (image1, image2) in enumerate(self.train_dataloader):
+                image1 = image1.to(self.device)
+                image2 = image2.to(self.device)
+
+                batch_size = image1.size(0)
+                latent_dim = torch.randn(
+                    (batch_size, config()["dataloader"]["latent_space"])
+                ).to(self.device)
+
+                train_loss.append(
+                    self.update_netG_training(
+                        image1=image1, image2=image2, latent_dim=latent_dim
+                    )
+                )
 
     @staticmethod
     def model_history():
