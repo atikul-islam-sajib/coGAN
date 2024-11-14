@@ -301,8 +301,6 @@ class Trainer:
             try:
                 self.history["netG_loss"].append(np.mean(netG_loss))
                 self.history["netD_loss"].append(np.mean(netD_loss))
-
-                print(self.history)
             except Exception as e:
                 print(f"Error occurred during training in model_history: {str(e)}")
                 exit(1)
