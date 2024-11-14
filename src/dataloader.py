@@ -3,6 +3,7 @@ import sys
 import cv2
 import math
 import zipfile
+import argparse
 import pandas as pd
 from PIL import Image
 from tqdm import tqdm
@@ -14,6 +15,7 @@ from sklearn.model_selection import train_test_split
 sys.path.append("./src/")
 
 from utils import config, dump, load
+
 
 class Loader:
     def __init__(
@@ -239,14 +241,65 @@ class Loader:
 
 
 if __name__ == "__main__":
-    loader = Loader(
-        dataset=config()["dataloader"]["dataset"],
-        batch_size=config()["dataloader"]["batch_size"],
-        image_size=config()["dataloader"]["image_size"],
-        split_size=config()["dataloader"]["split_size"],
+    parser = argparse.ArgumentParser(
+        description="Dataloader configuration for coupledGAN".title()
+    )
+    parser.add_argument(
+        "--dataset",
+        default=config()["dataloader"]["dataset"],
+        help="Path to the dataset file".capitalize(),
+    )
+    parser.add_argument(
+        "--batch_size",
+        default=config()["dataloader"]["batch_size"],
+        type=int,
+        help="Batch size for the dataloader".capitalize(),
+    )
+    parser.add_argument(
+        "--image_size",
+        default=config()["dataloader"]["image_size"],
+        choices=[32, 64, 128],
+        type=int,
+        help="Th size of the image to be loaded".capitalize(),
+    )
+    parser.add_argument(
+        "--split_size",
+        default=config()["dataloader"]["split_size"],
+        type=int,
+        help="The size of the split for the dataset".capitalize(),
     )
 
-    # loader.unzip_folder()
-    # loader.create_dataloader()
-    # loader.display_images()
-    Loader.dataset_details()
+    args = parser.parse_args()
+
+    loader = Loader(
+        dataset=args.dataset,
+        batch_size=args.batch_size,
+        image_size=args.image_size,
+    )
+
+    try:
+        loader.unzip_folder()
+    except ValueError as e:
+        print(f"Error occurred: {e}")
+        exit(1)
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        exit(1)
+    
+    try:
+        loader.create_dataloader()
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        exit(1)
+    
+    try:
+        loader.display_images()
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        exit(1)
+    
+    try:
+        Loader.dataset_details()
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        exit(1)
