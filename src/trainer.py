@@ -101,9 +101,6 @@ class Trainer:
     def update_netG_training(self, **kwargs):
         self.optimizerG.zero_grad()
 
-        image1 = kwargs["image1"]
-        image2 = kwargs["image2"]
-
         latent_dim = kwargs["latent_dim"]
 
         generated_image1, generated_image2 = self.netG(latent_dim)
@@ -127,7 +124,46 @@ class Trainer:
         return total_loss.item()
 
     def update_netD_training(self, **kwargs):
-        pass
+        self.optimizerD.zero_grad()
+
+        image1 = kwargs["image1"]
+        image2 = kwargs["image2"]
+
+        latent_dim = kwargs["latent_dim"]
+
+        generated_image1, generated_image2 = self.netG(latent_dim)
+
+        predicted_generated_image1, predicted_generated_image2 = self.netD(
+            generated_image1, generated_image2
+        )
+
+        predicted_actual_image1, predicted_actual_image2 = self.netD(image1, image2)
+
+        predicted_generated_image1_loss = self.adversarial_loss(
+            predicted_generated_image1, torch.zeros_like(predicted_generated_image1)
+        )
+        predicted_generated_image2_loss = self.adversarial_loss(
+            predicted_generated_image2, torch.zeros_like(predicted_generated_image2)
+        )
+
+        predicted_actual_image1_loss = self.adversarial_loss(
+            predicted_actual_image1, torch.ones_like(predicted_actual_image1)
+        )
+        predicted_actual_image2_loss = self.adversarial_loss(
+            predicted_actual_image2, torch.ones_like(predicted_actual_image2)
+        )
+
+        total_loss = (
+            predicted_generated_image1_loss
+            + predicted_generated_image2_loss
+            + predicted_actual_image1_loss
+            + predicted_actual_image2_loss
+        ) / 4
+        
+        total_loss.backward()
+        self.optimizerD.step()
+        
+        return total_loss.item()
 
     def display_progress(self, **kwargs):
         pass
@@ -147,6 +183,11 @@ class Trainer:
 
                 train_loss.append(
                     self.update_netG_training(
+                        image1=image1, image2=image2, latent_dim=latent_dim
+                    )
+                )
+                valid_loss.append(
+                    self.update_netD_training(
                         image1=image1, image2=image2, latent_dim=latent_dim
                     )
                 )
