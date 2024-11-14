@@ -7,11 +7,12 @@ from tqdm import tqdm
 import torch.nn as nn
 from PIL import Image
 from torchvision import transforms
+from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
 
 sys.path.append("./src/")
 
-from utils import config
+from utils import config, dump
 
 
 class Loader:
@@ -87,7 +88,9 @@ class Loader:
             self.X2
         ), "Length should be same while extracting the image".capitalize()
 
-        self.split_dataset(X=self.X1, y=self.X2)
+        dataset = self.split_dataset(X=self.X1, y=self.X2)
+
+        return dataset
 
     def unzip_folder(self):
         if os.path.exists(path=config()["path"]["processed_path"]):
@@ -98,7 +101,41 @@ class Loader:
             raise FileNotFoundError("File not found - processed data path".capitalize())
 
     def create_dataloader(self):
-        pass
+        try:
+            dataset = loader.features_extractor()
+
+            train_dataloader = DataLoader(
+                dataset=list(zip(dataset["X_train"], dataset["y_train"])),
+                batch_size=self.batch_size,
+                shuffle=True,
+            )
+
+            valid_dataloader = DataLoader(
+                dataset=list(zip(dataset["X_test"], dataset["y_test"])),
+                batch_size=self.batch_size,
+                shuffle=True,
+            )
+
+            for filename, value in [
+                ("train_dataloader", train_dataloader),
+                ("valid_dataloader", valid_dataloader),
+            ]:
+                dump(
+                    value=value,
+                    filename=os.path.join(
+                        config()["path"]["processed_path"], filename + ".pkl"
+                    ),
+                )
+
+            print(
+                "Dataloader is stored in the directory of {}".capitalize().format(
+                    config()["path"]["processed_path"]
+                )
+            )
+
+        except Exception as e:
+            print(f"Error occurred: {e}")
+            return None
 
     @staticmethod
     def dataset_details():
@@ -114,4 +151,4 @@ if __name__ == "__main__":
     )
 
     # loader.unzip_folder()
-    loader.features_extractor()
+    loader.create_dataloader()
