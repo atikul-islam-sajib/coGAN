@@ -18,4 +18,17 @@ netG:
   constant: 128
 
 trainer:
+  epochs: 10
+  lr: 2e-4
+  momentum: 0.75
+  beta1: 0.5
+  beta2: 0.999
   regularizer: 0.01
+  device: "cpu"
+  adam: True
+  SGD: False
+  l1_regularization: False
+  l2_regularization: False
+  elasticnet_regularization: False
+  mlflow: False
+  verbose: True
