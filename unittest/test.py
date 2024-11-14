@@ -1,8 +1,9 @@
 import os
 import sys
 import torch
-import torch.nn as nn
 import unittest
+import torch.nn as nn
+import torch.optim as optim
 
 
 sys.path.append("./src")
@@ -12,6 +13,7 @@ from loss import AdversarialLoss
 from generator import CoupledGenerators
 from discriminator import CoupledDiscriminators
 from dataloader import Loader
+from helper import helper
 
 
 class UnitTest(unittest.TestCase):
@@ -24,6 +26,15 @@ class UnitTest(unittest.TestCase):
         self.constant = config()["netG"]["constant"]
 
         self.dataset = config()["dataloader"]["dataset"]
+
+        self.adam = config()["trainer"]["adam"]
+        self.SGD = config()["trainer"]["SGD"]
+        self.beta1 = float(config()["trainer"]["beta1"])
+        self.beta2 = float(config()["trainer"]["beta2"])
+        self.lr = float(config()["trainer"]["lr"])
+        self.momentum = float(config()["trainer"]["momentum"])
+        self.regularizer = float(config()["trainer"]["regularizer"])
+        self.device = config()["trainer"]["device"]
 
         self.loader = Loader(
             dataset=self.dataset,
@@ -45,6 +56,16 @@ class UnitTest(unittest.TestCase):
         )
 
         self.adversarial_loss = AdversarialLoss()
+
+        self.init = helper(
+            adam=self.adam,
+            SGD=self.SGD,
+            beta1=self.beta1,
+            beta2=self.beta2,
+            lr=self.lr,
+            momentum=self.momentum,
+            reduction="mean",
+        )
 
     def test_coupleGenerator(self):
         self.Z = torch.randn(self.batch_size, self.latent_space)
@@ -112,6 +133,45 @@ class UnitTest(unittest.TestCase):
             config()["dataloader"]["image_size"],
             "image_size should be matched",
         )
+
+    def test_helper_method(self):
+        self.train_dataloader = self.init["train_dataloader"]
+        self.valid_dataloader = self.init["valid_dataloader"]
+
+        self.netG = self.init["netG"]
+        self.netD = self.init["netD"]
+
+        self.optimizerG = self.init["optimizerG"]
+        self.optimizerD = self.init["optimizerD"]
+
+        self.adversarial_loss = self.init["adversarial_loss"]
+
+        assert (
+            self.train_dataloader.__class__ == torch.utils.data.DataLoader
+        ), "Train Dataloader should be the class of dataloader".capitalize()
+        assert (
+            self.valid_dataloader.__class__ == torch.utils.data.DataLoader
+        ), "Validation Dataloader should be the class of dataloader".capitalize()
+
+        self.netG.__class__ == CoupledGenerators, "Generator should be the class of CoupledGenerators".capitalize()
+        self.netD.__class__ == CoupledDiscriminators, "Discriminator should be the class of CoupledDiscriminators".capitalize()
+
+        if self.adam:
+            assert (
+                self.optimizerG.__class__ == optim.Adam
+            ), "OptimizerG should be the class of Adam".capitalize()
+            assert (
+                self.optimizerD.__class__ == optim.Adam
+            ), "OptimizerD should be the class of Adam".capitalize()
+        else:
+            assert (
+                self.optimizerG.__class__ == optim.SGD
+            ), "OptimizerG should be the class of SGD".capitalize()
+            assert (
+                self.optimizerD.__class__ == optim.SGD
+            ), "OptimizerD should be the class of SGD".capitalize()
+
+        self.adversarial_loss.__class__ == AdversarialLoss, "AdversarialLoss should be the class of Adversarial".capitalize()
 
 
 if __name__ == "__main__":
