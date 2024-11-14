@@ -1,8 +1,11 @@
 import os
 import sys
+import cv2
 import zipfile
 import torch
+from tqdm import tqdm
 import torch.nn as nn
+from PIL import Image
 from torchvision import transforms
 
 sys.path.append("./src/")
@@ -18,6 +21,9 @@ class Loader:
         self.image_size = image_size
         self.batch_size = batch_size
         self.split_size = split_size
+
+        self.X1 = []
+        self.X2 = []
 
     def transforms(self, type: str = "coupled"):
         if type != "coupled":
@@ -46,6 +52,28 @@ class Loader:
     def split_dataset(self):
         pass
 
+    def features_extractor(self):
+        dataset = os.path.join(config()["path"]["processed_path"], "dataset")
+
+        for image in tqdm(os.listdir(dataset)):
+            image = os.path.join(dataset, image)
+
+            if (image is not None) and (image.endswith((".png", ".jpg", ".jpeg"))):
+                image = cv2.imread(filename=image)
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+                image = Image.fromarray(image)
+
+                self.X1.append(self.transforms(type=None)(image))
+                self.X2.append(self.transforms(type="coupled")(image))
+
+            else:
+                print(f"Invalid image: {image}")
+
+        assert len(self.X1) == len(
+            self.X2
+        ), "Length should be same while extracting the image".capitalize()
+
     def unzip_folder(self):
         if os.path.exists(path=config()["path"]["processed_path"]):
             with zipfile.ZipFile(file=self.dataset, mode="r") as zip_file:
@@ -70,4 +98,5 @@ if __name__ == "__main__":
         split_size=config()["dataloader"]["split_size"],
     )
 
-    loader.unzip_folder()
+    # loader.unzip_folder()
+    loader.features_extractor()
