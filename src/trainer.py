@@ -1,6 +1,7 @@
 import os
 import sys
 import torch
+import argparse
 import numpy as np
 import torch.nn as nn
 import torch.optim as optim
@@ -294,11 +295,11 @@ class Trainer:
             except Exception as e:
                 print(f"Error occurred during training in saved checkpoints: {str(e)}")
                 exit(1)
-                
+
             try:
                 self.history["netG_loss"].append(np.mean(netG_loss))
                 self.history["netD_loss"].append(np.mean(netD_loss))
-                
+
                 print(self.history)
             except Exception as e:
                 print(f"Error occurred during training in model_history: {str(e)}")
@@ -310,5 +311,109 @@ class Trainer:
 
 
 if __name__ == "__main__":
-    trainer = Trainer(epochs=4, device="cpu")
+    parser = argparse.ArgumentParser(description="Trainer for the coupledGAN".title())
+    parser.add_argument(
+        "--epochs",
+        default=config()["trainer"]["epochs"],
+        type=int,
+        help="Number of epochs for training".capitalize(),
+    )
+    parser.add_argument(
+        "--lr",
+        default=config()["trainer"]["lr"],
+        type=float,
+        help="Defines the learning rate".capitalize(),
+    )
+    parser.add_argument(
+        "--momentum",
+        default=config()["trainer"]["momentum"],
+        type=float,
+        help="Defines the momentum for SGD".capitalize(),
+    )
+    parser.add_argument(
+        "--beta1",
+        default=config()["trainer"]["beta1"],
+        type=float,
+        help="Defines the beta1 for Adam".capitalize(),
+    )
+    parser.add_argument(
+        "--beta2",
+        default=config()["trainer"]["beta1"],
+        type=float,
+        help="Defines the beta2 for Adam".capitalize(),
+    )
+    parser.add_argument(
+        "--regularizer",
+        default=config()["trainer"]["regularizer"],
+        type=float,
+        help="Regularization term for the loss function".capitalize(),
+    )
+    parser.add_argument(
+        "--device",
+        default=config()["trainer"]["device"],
+        choices=["cpu", "cuda"],
+        help="Device for training".capitalize(),
+    )
+    parser.add_argument(
+        "--adam",
+        type=bool,
+        default=config()["trainer"]["adam"],
+        help="Use Adam optimizer".capitalize(),
+    )
+    parser.add_argument(
+        "--SGD",
+        type=bool,
+        default=config()["trainer"]["SGD"],
+        help="Use SGD optimizer".capitalize(),
+    )
+    parser.add_argument(
+        "--l1_regularization",
+        type=bool,
+        default=config()["trainer"]["l1_regularization"],
+        help="Use L1 regularization".capitalize(),
+    )
+    parser.add_argument(
+        "--l2_regularization",
+        type=bool,
+        default=config()["trainer"]["l2_regularization"],
+        help="Use L2 regularization".capitalize(),
+    )
+    parser.add_argument(
+        "--elasticnet_regularization",
+        type=bool,
+        default=config()["trainer"]["elasticnet_regularization"],
+        help="Use ElasticNet regularization".capitalize(),
+    )
+    parser.add_argument(
+        "--mlflow",
+        type=bool,
+        default=config()["trainer"]["mlflow"],
+        help="Enable logging to MLflow".capitalize(),
+    )
+    parser.add_argument(
+        "--verbose",
+        type=bool,
+        default=config()["trainer"]["verbose"],
+        help="Display progress during training".capitalize(),
+    )
+
+    args = parser.parse_args()
+
+    trainer = Trainer(
+        epochs=args.epochs,
+        lr=args.lr,
+        momentum=args.momentum,
+        beta1=args.beta1,
+        beta2=args.beta2,
+        regularizer=args.regularizer,
+        device=args.device,
+        adam=args.adam,
+        SGD=args.SGD,
+        l1_regularization=args.l1_regularization,
+        l2_regularization=args.l2_regularization,
+        elasticnet_regularization=args.elasticnet_regularization,
+        mlflow=args.mlflow,
+        verbose=args.verbose,
+    )
+
     trainer.train()
