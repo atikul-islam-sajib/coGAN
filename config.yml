@@ -2,12 +2,14 @@ path:
   raw_path: "./data/raw/"
   processed_path: "./data/processed/"
   artifacts_path: "./artifacts/files/"
+  train_results: "./artifacts/outputs/train_results/"
+  test_result: "./artifacts/outputs/test_result/"
 
 dataloader:
   dataset: "./data/raw/dataset.zip"
-  batch_size: 16
+  batch_size: 32
   image_size: 32
-  split_size: 0.25
+  split_size: 0.30
 
 netG:
   latent_space: 100

@@ -1,9 +1,11 @@
 import os
 import sys
 import torch
+import numpy as np
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
+from torchvision.utils import save_image
 
 sys.path.append("./src/")
 
@@ -166,7 +168,18 @@ class Trainer:
         return total_loss.item()
 
     def display_progress(self, **kwargs):
-        pass
+        epoch = kwargs["epoch"]
+        train_loss = kwargs["train_loss"]
+        valid_loss = kwargs["valid_loss"]
+
+        if self.verbose:
+            print(
+                "Epochs: [{}/{}] - train_loss: {:.4f} - test_loss: {:.4f}".format(
+                    epoch + 1, self.epochs, train_loss, valid_loss
+                )
+            )
+        else:
+            print(f"Epoch: {epoch + 1}/{self.epochs} is completed".capitalize())
 
     def train(self):
         for index, epoch in tqdm(enumerate(range(self.epochs))):
@@ -192,7 +205,34 @@ class Trainer:
                     )
                 )
 
-            print(train_loss, valid_loss)
+            try:
+                self.display_progress(
+                    epoch=epoch,
+                    train_loss=np.mean(train_loss),
+                    valid_loss=np.mean(valid_loss),
+                )
+            except Exception as e:
+                print(f"Error occurred during training in display progress: {str(e)}")
+                exit(1)
+
+            try:
+                batch_size = config()["dataloader"]["batch_size"]
+                latent_dim = config()["netG"]["latent_space"]
+
+                Z = torch.randn((batch_size, latent_dim))
+
+                image1, image2 = self.netG(Z)
+
+                train_results = config()["path"]["train_results"]
+
+                for filename, image in [("image1", image1), ("image2", image2)]:
+                    save_image(
+                        image, os.path.join(train_results, f"{filename}{epoch + 1}.png")
+                    )
+
+            except Exception as e:
+                print(f"Error occurred during training: {str(e)}")
+                exit(1)
 
     @staticmethod
     def model_history():
@@ -200,5 +240,5 @@ class Trainer:
 
 
 if __name__ == "__main__":
-    trainer = Trainer(epochs=1, device="cpu")
+    trainer = Trainer(epochs=30, device="cpu")
     trainer.train()
