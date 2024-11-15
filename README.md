@@ -136,7 +136,7 @@ loader = Loader(
     loader.unzip_folder()
     loader.create_dataloader()
 
-#================================================================================================================#
+#***********************************************************************#
 
 # Set up the trainer with learning rate, epochs, and latent space size
 trainer = Trainer(
@@ -151,7 +151,7 @@ trainer = Trainer(
 
 trainer.train()
 
-#================================================================================================================#
+#***********************************************************************#
 
 # Test the generated dataset and display the synthetic images
 tester = Tester(
@@ -164,7 +164,7 @@ tester = Tester(
 )
 tester.test()
 
-#================================================================================================================#
+#***********************************************************************#
 
 from IPython.display import Image
 Image("/content/coGAN/outputs/artifacts/test_result/XYZ.png")
