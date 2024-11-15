@@ -6,6 +6,7 @@ import argparse
 sys.path.append("./src/")
 
 from utils import config
+from tester import Tester
 from trainer import Trainer
 from dataloader import Loader
 from generator import CoupledGenerators
@@ -125,6 +126,18 @@ def cli():
         help="Display progress during training".capitalize(),
     )
     parser.add_argument(
+        "--quantity",
+        type=int,
+        default=config()["tester"]["quantity"],
+        help="Define the number of synthetic data that you want to create".capitalize(),
+    )
+    parser.add_argument(
+        "--model",
+        type=str,
+        default=config()["tester"]["model"],
+        help="Define which model you want to".capitalize(),
+    )
+    parser.add_argument(
         "--train", action="store_true", help="Train the model".capitalize()
     )
     parser.add_argument(
@@ -186,6 +199,10 @@ def cli():
 
         trainer.train()
         Trainer.model_history()
+
+    if args.test:
+        tester = Tester(quantity=args.quantity, model=args.model, device=args.device)
+        tester.test()
 
 
 if __name__ == "__main__":
