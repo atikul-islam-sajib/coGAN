@@ -9,7 +9,7 @@ Coupled Generative Adversarial Networks (CoupledGAN or CoGAN) is a framework des
 
 1. **Dual Generators and Discriminators:**
    - CoGAN consists of two (or more) GANs, each responsible for modeling data in its own domain.
-   - Each GAN has its own generator \(G_1\), \(G_2\) and discriminator \(D_1\), \(D_2\).
+   - Each GAN has its own generator \(G1\), \(G2\) and discriminator \(D1\), \(D2\).
 
 2. **Weight Sharing:**
    - The networks enforce the sharing of certain layers in the generators and discriminators (typically the early layers in the generator and the later layers in the discriminator). This allows CoGAN to capture a shared latent representation across domains.
