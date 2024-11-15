@@ -1,3 +1,6 @@
+Coupled Generative Adversarial Networks (CoupledGAN or CoGAN) is a framework designed to learn a joint representation of multiple domains without requiring paired examples during training. It is particularly useful in scenarios where the data from two different domains share some common underlying structure but are not aligned (e.g., images of the same objects in different styles, languages, or modalities).
+
+
 ![CoupledGAN](https://github.com/atikul-islam-sajib/Research-Assistant-Work-HWR/blob/main/fake_image.png)
 
 # Fake Image Generator - Generative Adversarial Network for Custom Dataset: Generative Models
