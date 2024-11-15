@@ -1,5 +1,161 @@
-# coGAN
- CoGAN (Coupled Generative Adversarial Networks) is a deep learning architecture designed for learning a joint distribution of multiple domains without the need for paired data
+![CoupledGAN](https://github.com/atikul-islam-sajib/Research-Assistant-Work-HWR/blob/main/fake_image.png)
+
+# Fake Image Generator - Generative Adversarial Network for Custom Dataset: Generative Models
+
+## Overview
+
+coupledGAN (GAN-based Project for Synthesizing images) is a machine learning project focused on generating synthetic images using Generative Adversarial Networks (GANs). Specifically, it is designed to work with the Custom dataset, a large database of handwritten digits commonly used for training various image processing systems.
+
+## Features
+
+- Utilizes PyTorch for implementing GAN models.
+- Provides scripts for easy training and generating synthetic images.
+- Command Line Interface for easy interaction.
+- Includes a custom data loader for the Custom dataset.
+- Customizable training parameters for experimenting with GAN.
+
+## Installation
+
+Clone the repository:
+
+```
+git clone https://github.com/atikul-islam-sajib/coGAN.git
+
+cd coGAN
+```
+
+# Install dependencies
+
+```
+pip install -r requirements.txt
+```
+
+## Usage
+
+Examples of commands and their explanations.
+
+```bash
+python /path/to/coGAN/src/cli.py --help
+```
+
+### Options
+
+- `--batch_size BATCH_SIZE`: Set the batch size for the dataloader. (Default: specify if there's one)
+- `--image_path`: Define the dataset path.
+- `--epochs EPOCHS`: Set the number of training epochs.
+- `--latent_space LATENT_SPACE`: Define the size of the latent space for the model.
+- `--lr LR`: Specify the learning rate for training the model.
+- `--quantity SAMPLES`: Determine the number of samples to generate after training.
+- `--test`: Run tests with synthetic data to validate model performance.
+- `--device`: Train the model with CPU, GPU, MPS.
+- `--verbose`: Display the critic loss and generator loss in each iterations[True/False]
+
+## Training and Generating Images(CLI)
+
+### Training the GAN Model
+
+To train the GAN model with default parameters with mps:
+
+```
+!python /content/coGAN/src/cli.py  --epochs 200 --latent_space 100 --image_size 64  --lr 0.00005 --device cuda --batch_size 64 --dataset /image.zip/ --display True --train
+```
+
+To train the GAN model with default parameters with cpu:
+
+```
+!python /content/coGAN/src/cli.py  --epochs 200 --latent_space 100 --image_size 64  --lr 0.00005 --device cuda --batch_size 64 --dataset /image.zip/ --verbose True --train
+```
 
 
-completed on 29.11.2024
+### Generating Images
+
+To generate images using the trained model:
+
+```
+!python /content/coGAN/src/cli.py --quantity 20 --device cuda --test
+```
+
+### Viewing Generated Images
+
+Check the specified output directory for the generated images.
+
+```
+from IPython.display import Image
+Image(filename='/content/coGAN/artifacts/outputs/train_results/XYZ.png')
+```
+
+## Core Script Usage
+
+The core script sets up the necessary components for training the GAN. Here's a quick overview of what each part does:
+
+```python
+from src.dataloader import Loader
+from src.generator import CoupledGenerators
+from src.discriminator import CoupledDiscriminators
+from src.trainer import Trainer
+from src.tester import Tester
+
+# Initialize the data loader with batch size
+loader = Loader(
+    dataset = "/content/drive/MyDrive/anime.zip",
+    batch_size = 128,
+    image_size = 64,
+    split_size = 0.25
+)
+
+    loader.unzip_folder()
+    loader.create_dataloader()
+
+#================================================================================================================#
+
+# Set up the trainer with learning rate, epochs, and latent space size
+trainer = Trainer(
+    lr = 0.0002,
+    epochs = 20,
+    verbose = True
+
+    ... ... ... 
+    ... ... ...
+    ... ... ...
+)
+
+trainer.train()
+
+#================================================================================================================#
+
+# Test the generated dataset and display the synthetic images
+tester = Tester(
+    model="best",
+    quantity = 64,
+    device="cuda"
+
+    ... ... ...
+    ... ... ...
+)
+tester.test()
+
+#================================================================================================================#
+
+from IPython.display import Image
+Image("/content/coGAN/outputs/artifacts/test_result/XYZ.png")
+```
+
+This script initializes the data loader, downloads the Custom dataset, and prepares the data loader. It then sets up and starts the training process for the GAN model.
+
+## Notebook Training
+
+For detailed documentation on the implementation and usage using notebook, visit the [Notebook for CLI](./notebooks/coGAN-Tutorial.ipynb).
+
+For detailed documentation on the implementation and usage using notebook, visit the [Notebook for ModelPrototype](./notebooks/ModelPrototype.ipynb).
+
+## Contributing
+
+Contributions to improve the project are welcome. Please follow the standard procedures for contributing to open-source projects.
+
+## License
+
+This project is licensed under [MIT LICENSE](./LICENSE). Please see the LICENSE file for more details.
+
+## Contact
+
+For any inquiries or suggestions, feel free to reach out to [atikulislamsajib137@gmail.com].
