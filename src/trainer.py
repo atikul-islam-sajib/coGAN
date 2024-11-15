@@ -237,7 +237,7 @@ class Trainer:
 
         if self.verbose:
             print(
-                "Epochs: [{}/{}] - train_loss: {:.4f} - test_loss: {:.4f}".format(
+                "Epochs: [{}/{}] - netG_loss: {:.4f} - netD_loss: {:.4f}".format(
                     epoch + 1, self.epochs, train_loss, valid_loss
                 )
             )
