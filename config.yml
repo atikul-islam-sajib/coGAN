@@ -33,3 +33,7 @@ trainer:
   elasticnet_regularization: False
   mlflow: False
   verbose: True
+
+tester:
+  quantity: 64
+  model: "best"
