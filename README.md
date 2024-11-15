@@ -23,6 +23,27 @@ Coupled Generative Adversarial Networks (CoupledGAN or CoGAN) is a framework des
 - Includes a custom data loader for the Custom dataset.
 - Customizable training parameters for experimenting with GAN.
 
+## Directory Structure
+```
+D:.
+├───.dvc
+├───artifacts
+│   ├───checkpoints
+│   │   ├───test_model
+│   │   └───train_models
+│   ├───files
+│   └───outputs
+│       ├───test_result
+│       └───train_results
+├───data
+│   ├───processed
+│   └───raw
+├───logs
+├───notebooks
+├───src
+└───unittest
+```
+
 ## Installation
 
 Clone the repository:
