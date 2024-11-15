@@ -8,11 +8,7 @@ setup(
     author_email="atikulislamsajib137@gmail.com",
     url="https://github.com/atikul-islam-sajib/coGAN",
     packages=find_packages(),
-    install_requires=[
-        "numpy==1.21.2",
-        "pandas==1.3.3",
-        "torch==1.9.0",
-    ],
+    install_requires=[],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
