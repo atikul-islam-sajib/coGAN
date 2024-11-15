@@ -5,9 +5,14 @@ Coupled Generative Adversarial Networks (CoupledGAN or CoGAN) is a framework des
 
 ![CoupledGAN](https://github.com/atikul-islam-sajib/Research-Assistant-Work-HWR/blob/main/fake_image.png)
 
-## Overview
+## Key Features of CoupledGAN (CoGAN):
 
-coupledGAN (GAN-based Project for Synthesizing images) is a machine learning project focused on generating synthetic images using Generative Adversarial Networks (GANs). Specifically, it is designed to work with the Custom dataset, a large database of handwritten digits commonly used for training various image processing systems.
+1. **Dual Generators and Discriminators:**
+   - CoGAN consists of two (or more) GANs, each responsible for modeling data in its own domain.
+   - Each GAN has its own generator \(G_1\), \(G_2\) and discriminator \(D_1\), \(D_2\).
+
+2. **Weight Sharing:**
+   - The networks enforce the sharing of certain layers in the generators and discriminators (typically the early layers in the generator and the later layers in the discriminator). This allows CoGAN to capture a shared latent representation across domains.
 
 ## Features
 
