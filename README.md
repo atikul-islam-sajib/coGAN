@@ -152,7 +152,7 @@ This script initializes the data loader, downloads the Custom dataset, and prepa
 
 ## Notebook Training
 
-For detailed documentation on the implementation and usage using notebook, visit the [Notebook for CLI](./notebooks/coGAN-Tutorial.ipynb).
+For detailed documentation on the implementation and usage using notebook, visit the [Notebook for CLI](https://github.com/atikul-islam-sajib/coGAN/blob/main/notebooks/coGAN_Tutorial.ipynb).
 
 For detailed documentation on the implementation and usage using notebook, visit the [Notebook for ModelPrototype](./notebooks/ModelPrototype.ipynb).
 
