@@ -107,7 +107,7 @@ class Loader:
 
     def create_dataloader(self):
         try:
-            dataset = loader.features_extractor()
+            dataset = self.features_extractor()
 
             train_dataloader = DataLoader(
                 dataset=list(zip(dataset["X_train"], dataset["y_train"])),
@@ -278,31 +278,32 @@ if __name__ == "__main__":
         dataset=args.dataset,
         batch_size=args.batch_size,
         image_size=args.image_size,
+        split_size=args.split_size,
     )
 
     try:
         loader.unzip_folder()
     except ValueError as e:
-        print(f"Error occurred: {e}")
+        print(f"Error occurred in unzipping: {e}")
         exit(1)
     except Exception as e:
-        print(f"Error occurred: {e}")
+        print(f"Error occurred in unzipping: {e}")
         exit(1)
 
     try:
         loader.create_dataloader()
     except Exception as e:
-        print(f"Error occurred: {e}")
+        print(f"Error occurred creating data: {e}")
         exit(1)
 
     try:
         loader.display_images()
     except Exception as e:
-        print(f"Error occurred: {e}")
+        print(f"Error occurred display the image: {e}")
         exit(1)
 
     try:
         Loader.dataset_details()
     except Exception as e:
-        print(f"Error occurred: {e}")
+        print(f"Error occurred in detailing the dataset: {e}")
         exit(1)

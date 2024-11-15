@@ -146,40 +146,42 @@ def cli():
 
     args = parser.parse_args()
 
-    loader = Loader(
-        dataset=args.dataset,
-        batch_size=args.batch_size,
-        image_size=args.image_size,
-    )
-
-    try:
-        loader.unzip_folder()
-    except ValueError as e:
-        print(f"Error occurred: {e}")
-        exit(1)
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        exit(1)
-
-    try:
-        loader.create_dataloader()
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        exit(1)
-
-    try:
-        loader.display_images()
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        exit(1)
-
-    try:
-        Loader.dataset_details()
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        exit(1)
-
     if args.train:
+        loader = Loader(
+            dataset=args.dataset,
+            batch_size=args.batch_size,
+            image_size=args.image_size,
+            split_size=args.split_size,
+        )
+
+        try:
+            loader.unzip_folder()
+        except ValueError as e:
+            print(f"Error occurred in unzipping: {e}")
+            exit(1)
+        except Exception as e:
+            print(f"Error occurred in unzipping: {e}")
+            exit(1)
+
+        try:
+            loader.create_dataloader()
+        except Exception as e:
+            print(f"Error occurred creating data: {e}")
+            exit(1)
+
+        try:
+            loader.display_images()
+        except Exception as e:
+            print(f"Error occurred display the image: {e}")
+            exit(1)
+
+        try:
+            loader.dataset_details()
+        except Exception as e:
+            print(f"Error occurred in detailing the dataset: {e}")
+            exit(1)
+
+        
         trainer = Trainer(
             epochs=args.epochs,
             lr=args.lr,
@@ -200,7 +202,7 @@ def cli():
         trainer.train()
         Trainer.model_history()
 
-    if args.test:
+    elif args.test:
         tester = Tester(quantity=args.quantity, model=args.model, device=args.device)
         tester.test()
 

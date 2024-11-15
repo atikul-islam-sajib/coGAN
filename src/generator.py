@@ -155,6 +155,9 @@ if __name__ == "__main__":
     )
 
     image1, image2 = netG(torch.randn(batch_size, latent_space))
+    
+    print("Image1 shape # {0}".format(image1.size()))
+    print("Image2 shape # {0}".format(image2.size()))
 
     assert (
         image1.size() == image2.size()

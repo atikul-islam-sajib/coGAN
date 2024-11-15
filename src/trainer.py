@@ -245,7 +245,7 @@ class Trainer:
             print(f"Epoch: {epoch + 1}/{self.epochs} is completed".capitalize())
 
     def train(self):
-        experiment_name = "coupledGAN - version 0.0.5"
+        experiment_name = "coupledGAN - version 0.0.12"
         experiment_id = mlflow.create_experiment(experiment_name)
         with mlflow.start_run(experiment_id=experiment_id) as run:
             for _, epoch in tqdm(enumerate(range(self.epochs))):
