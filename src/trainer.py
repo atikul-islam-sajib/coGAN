@@ -102,6 +102,9 @@ class Trainer:
 
         self.device = device_init(device=self.device)
 
+        self.netG.to(self.device)
+        self.netD.to(self.device)
+
         self.loss = float("inf")
         self.history = {"netG_loss": [], "netD_loss": []}
 
