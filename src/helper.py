@@ -57,6 +57,7 @@ def helper(**kwargs):
     if adam:
         optimizerG = optim.Adam(params=netG.parameters(), lr=lr, betas=(beta1, beta2))
         optimizerD = optim.Adam(params=netD.parameters(), lr=lr, betas=(beta1, beta2))
+        
     elif SGD:
         optimizerG = optim.SGD(params=netG.parameters(), lr=lr, momentum=momentum)
         optimizerD = optim.SGD(params=netD.parameters(), lr=lr, momentum=momentum)

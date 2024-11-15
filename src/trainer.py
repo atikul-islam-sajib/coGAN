@@ -147,14 +147,14 @@ class Trainer:
                     "best.pth",
                 ),
             )
-        else:
-            torch.save(
-                self.netG.state_dict(),
-                os.path.join(
-                    config()["path"]["train_models"],
-                    "netG{}.pth".format(epoch + 1),
-                ),
-            )
+
+        torch.save(
+            self.netG.state_dict(),
+            os.path.join(
+                config()["path"]["train_models"],
+                "netG{}.pth".format(epoch + 1),
+            ),
+        )
 
     def update_netG_training(self, **kwargs):
         self.optimizerG.zero_grad()
@@ -245,7 +245,9 @@ class Trainer:
             print(f"Epoch: {epoch + 1}/{self.epochs} is completed".capitalize())
 
     def train(self):
-        with mlflow.start_run(run_name="coupledGAN") as run:
+        experiment_name = "coupledGAN - version 0.0.5"
+        experiment_id = mlflow.create_experiment(experiment_name)
+        with mlflow.start_run(experiment_id=experiment_id) as run:
             for _, epoch in tqdm(enumerate(range(self.epochs))):
                 netG_loss = []
                 netD_loss = []

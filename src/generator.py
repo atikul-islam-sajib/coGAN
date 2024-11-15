@@ -15,7 +15,7 @@ class CoupledGenerators(nn.Module):
         self,
         latent_space: int = 100,
         constant: int = 128,
-        image_size: int = 32,
+        image_size: int = 64,
     ):
         super(CoupledGenerators, self).__init__()
         self.latent_space = latent_space

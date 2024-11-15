@@ -19,7 +19,7 @@ netG:
   constant: 128
 
 trainer:
-  epochs: 5
+  epochs: 300
   lr: 2e-4
   momentum: 0.75
   beta1: 0.5

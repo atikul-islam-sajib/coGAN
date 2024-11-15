@@ -63,12 +63,14 @@ class CoupledDiscriminators(nn.Module):
 
     def forward(self, image1: torch.Tensor, image2: torch.Tensor):
         if isinstance(image1, torch.Tensor) and isinstance(image2, torch.Tensor):
-            shared = self.sharedConvolution(image1)
+            shared1 = self.sharedConvolution(image1)
+            shared1 = shared1.view(shared1.size(0), -1)
 
-            shared = shared.view(shared.size(0), -1)
+            shared2 = self.sharedConvolution(image2)
+            shared2 = shared2.view(shared2.size(0), -1)
 
-            validity1 = self.discriminator1(shared)
-            validity2 = self.discriminator2(shared)
+            validity1 = self.discriminator1(shared1)
+            validity2 = self.discriminator2(shared2)
 
             return validity1, validity2
 
@@ -83,7 +85,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "--image_size",
         default=config()["dataloader"]["image_size"],
-        choices=[32, 64, 128],
         type=int,
         help="Th size of the image to be loaded".capitalize(),
     )
@@ -104,7 +105,12 @@ if __name__ == "__main__":
     constant = args.constant
     channels = 3
 
-    netD = CoupledDiscriminators()
+    netD = CoupledDiscriminators(
+        channels=channels,
+        image_size=image_size,
+        constant=constant,
+    )
+
     validity1, validity2 = netD(
         image1=torch.randn((batch_size, channels, image_size, image_size)),
         image2=torch.randn((batch_size, channels, image_size, image_size)),
