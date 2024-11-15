@@ -167,5 +167,3 @@ This project is licensed under [MIT LICENSE](./LICENSE). Please see the LICENSE 
 ## Contact
 
 For any inquiries or suggestions, feel free to reach out to [atikulislamsajib137@gmail.com].
-
-# UPDATE SOON .....
