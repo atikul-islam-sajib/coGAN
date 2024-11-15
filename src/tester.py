@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 sys.path.append("./src/")
 
-from utils import config, load
+from utils import config, load, device_init
 from generator import CoupledGenerators
 
 
@@ -17,6 +17,8 @@ class Tester:
         self.quantity = quantity
         self.model = model
         self.device = device
+
+        self.device = device_init(device = self.device)
 
     def select_the_best_model(self):
         if (os.path.exists(config()["path"]["test_model"])) and (
@@ -65,12 +67,14 @@ class Tester:
 
             self.netG.load_state_dict(self.select_the_best_model())
 
+            self.netG.to(self.device)
+
             plt.figure(figsize=(20, 15))
 
             try:
                 Z = torch.randn((self.quantity, config()["netG"]["latent_space"]))
 
-                generated_image1, generated_image2 = self.netG(Z)
+                generated_image1, generated_image2 = self.netG(Z.to(self.device))
 
                 num_of_rows = int(math.sqrt(generated_image1.size(0)))
                 num_of_cols = generated_image1.size(0) // num_of_rows
