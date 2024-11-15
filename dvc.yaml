@@ -1,0 +1,27 @@
+stages:
+  train:
+    cmd: python src/cli.py --train
+    deps:
+      - src/cli.py
+      - src/dataloader.py
+      - src/generator.py
+      - src/tester.py
+      - src/helper.py
+      - src/loss.py
+      - src/trainer.py
+      - src/utils.py
+      - ./data/
+      - ./artifacts/
+
+  test:
+    cmd: python src/cli.py --test
+    deps:
+      - src/cli.py
+      - src/dataloader.py
+      - src/generator.py
+      - src/tester.py
+      - src/helper.py
+      - src/loss.py
+      - src/trainer.py
+      - src/utils.py
+    

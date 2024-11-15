@@ -1,0 +1,82 @@
+schema: '2.0'
+stages:
+  train:
+    cmd: python src/cli.py --train
+    deps:
+    - path: ./artifacts/
+      hash: md5
+      md5: 47dab99e8f021213719cfdcbd06c127c.dir
+      size: 23858591
+      nfiles: 31
+    - path: ./data/
+      hash: md5
+      md5: 68d312f71373d399b42c28141c28f3f1.dir
+      size: 24283840
+      nfiles: 1007
+    - path: src/cli.py
+      hash: md5
+      md5: 6695cf1b0aec37d94841fbcb5ac89720
+      size: 6042
+    - path: src/dataloader.py
+      hash: md5
+      md5: 07f1753be97e418e3012bc6278158d3f
+      size: 9860
+    - path: src/generator.py
+      hash: md5
+      md5: cb3423fb00048945128050618719f192
+      size: 5396
+    - path: src/helper.py
+      hash: md5
+      md5: a9f776eafb180d27f7c04cbafdb48a5f
+      size: 3335
+    - path: src/loss.py
+      hash: md5
+      md5: 3a557e9bff79adfa648236ed711f7b2d
+      size: 1594
+    - path: src/tester.py
+      hash: md5
+      md5: fe3d6bb5df8c79f0d29e17d31a129846
+      size: 4997
+    - path: src/trainer.py
+      hash: md5
+      md5: fa9af70a623355587278fc7c10e1f2d4
+      size: 17395
+    - path: src/utils.py
+      hash: md5
+      md5: ab60d7a336f92770fa21d9c8c0311aac
+      size: 1249
+  test:
+    cmd: python src/cli.py --test
+    deps:
+    - path: src/cli.py
+      hash: md5
+      md5: 6695cf1b0aec37d94841fbcb5ac89720
+      size: 6042
+    - path: src/dataloader.py
+      hash: md5
+      md5: 07f1753be97e418e3012bc6278158d3f
+      size: 9860
+    - path: src/generator.py
+      hash: md5
+      md5: cb3423fb00048945128050618719f192
+      size: 5396
+    - path: src/helper.py
+      hash: md5
+      md5: a9f776eafb180d27f7c04cbafdb48a5f
+      size: 3335
+    - path: src/loss.py
+      hash: md5
+      md5: 3a557e9bff79adfa648236ed711f7b2d
+      size: 1594
+    - path: src/tester.py
+      hash: md5
+      md5: fe3d6bb5df8c79f0d29e17d31a129846
+      size: 4997
+    - path: src/trainer.py
+      hash: md5
+      md5: fa9af70a623355587278fc7c10e1f2d4
+      size: 17395
+    - path: src/utils.py
+      hash: md5
+      md5: ab60d7a336f92770fa21d9c8c0311aac
+      size: 1249
